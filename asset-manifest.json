@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/maru-hair-salon/static/js/main.7053f8be.js",
+    "main.js": "/maru-hair-salon/static/js/main.b9e17183.js",
     "index.html": "/maru-hair-salon/index.html",
-    "main.7053f8be.js.map": "/maru-hair-salon/static/js/main.7053f8be.js.map"
+    "main.b9e17183.js.map": "/maru-hair-salon/static/js/main.b9e17183.js.map"
   },
   "entrypoints": [
-    "static/js/main.7053f8be.js"
+    "static/js/main.b9e17183.js"
   ]
 }
