@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useDialogFocus } from "../hooks/useDialogFocus";
 
 interface CompletedModalProps {
   readonly onClose: () => void;
@@ -20,6 +21,8 @@ export const CompletedModal = memo(function CompletedModal({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  const dialogRef = useDialogFocus<HTMLDivElement>();
+
   return (
     <motion.div
       className="modal-overlay"
@@ -33,6 +36,7 @@ export const CompletedModal = memo(function CompletedModal({
       transition={{ duration: 0.2 }}
     >
       <motion.div
+        ref={dialogRef}
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{ textAlign: "center" }}

@@ -77,7 +77,9 @@ export default function App() {
     const errors = validateCustomer(customer);
     if (hasValidationErrors(errors)) {
       setCustomerErrors(errors);
-      document.getElementById("customer")?.scrollIntoView({ behavior: "smooth" });
+      document
+        .getElementById(errors.name ? "customer-name" : "customer-phone")
+        ?.focus();
       return;
     }
     setShowConfirm(true);
@@ -126,6 +128,9 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <GlobalStyle />
+      <a className="skip-link" href="#menu">
+        予約メニューへスキップ
+      </a>
       <header>
         <Nav scrolled={scrolled} onNavigate={navigate} currentView={currentView} />
       </header>

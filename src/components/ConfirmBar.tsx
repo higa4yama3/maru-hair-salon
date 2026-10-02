@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { MenuItem, CustomerInfo } from "../types";
 import { getCurrentStep, isStepDone } from "../utils/stepStatus";
 
@@ -31,8 +31,25 @@ export const ConfirmBar = memo(function ConfirmBar({
     [menuItems]
   );
 
+  // Expose the bar height so scroll-padding keeps focused fields above it
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight;
+      root.style.setProperty("--confirm-bar-h", `${Math.ceil(height)}px`);
+    });
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--confirm-bar-h");
+    };
+  }, []);
+
   return (
-    <div className="confirm-bar" role="status" aria-label="予約ステータス">
+    <div ref={barRef} className="confirm-bar" role="region" aria-label="予約ステータス">
       <div
         style={{
           maxWidth: 1100,
@@ -57,8 +74,9 @@ export const ConfirmBar = memo(function ConfirmBar({
               .filter(Boolean)
               .join(" ");
 
-            return <div key={step} className={classNames} />;
+            return <div key={step} className={classNames} aria-hidden="true" />;
           })}
+          <span className="sr-only">ステップ {currentStep}/3</span>
           <span
             className="mono"
             style={{

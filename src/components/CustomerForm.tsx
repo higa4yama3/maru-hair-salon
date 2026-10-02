@@ -81,6 +81,7 @@ export const CustomerForm = memo(function CustomerForm({
           </label>
           <input
             id="customer-name"
+            name="name"
             className={`input-field ${errors.name ? "has-error" : ""}`}
             placeholder="山田 太郎…"
             value={info.name}
@@ -100,6 +101,7 @@ export const CustomerForm = memo(function CustomerForm({
           </label>
           <input
             id="customer-phone"
+            name="tel"
             className={`input-field ${errors.phone ? "has-error" : ""}`}
             type="tel"
             placeholder="090-1234-5678…"
@@ -119,6 +121,7 @@ export const CustomerForm = memo(function CustomerForm({
           </label>
           <input
             id="customer-note"
+            name="note"
             className="input-field"
             placeholder="初めてです / 前回と同じ感じで etc."
             value={info.note}

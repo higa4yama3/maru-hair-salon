@@ -77,29 +77,30 @@ export const MenuSection = memo(function MenuSection({
 
       <div
         style={{ display: "flex", gap: 4, marginTop: 32, flexWrap: "wrap" }}
-        role="tablist"
-        aria-label="メニューカテゴリ"
+        role="group"
+        aria-label="メニューカテゴリで絞り込む"
       >
         {CATEGORIES.map((c) => (
           <button
             key={c}
+            type="button"
             className={`cat-tab ${cat === c ? "active" : ""}`}
             onClick={() => setCat(c)}
-            role="tab"
-            aria-selected={cat === c}
+            aria-pressed={cat === c}
           >
             {CATEGORY_LABELS[c]}
           </button>
         ))}
       </div>
 
-      <div style={{ marginTop: 24 }} role="listbox" aria-label="メニュー一覧" aria-multiselectable="true">
+      <div style={{ marginTop: 24 }} role="group" aria-label="メニュー一覧（最大4つまで選択）">
         {filtered.map((item, index) => {
           const isSelected = isItemSelected(item.id);
           const isDisabled = isAtLimit && !isSelected;
           return (
-            <motion.div
+            <motion.button
               key={item.id}
+              type="button"
               className={`menu-item ${isSelected ? "selected" : ""}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -109,24 +110,16 @@ export const MenuSection = memo(function MenuSection({
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileTap={isDisabled ? undefined : { scale: 0.98 }}
-              onClick={() => !isDisabled && onToggle(item)}
-              onKeyDown={(e) => {
-                if (!isDisabled && (e.key === "Enter" || e.key === " ")) {
-                  e.preventDefault();
-                  onToggle(item);
-                }
-              }}
-              role="option"
-              tabIndex={isDisabled ? -1 : 0}
-              aria-selected={isSelected}
-              aria-disabled={isDisabled}
+              onClick={() => onToggle(item)}
+              disabled={isDisabled}
+              aria-pressed={isSelected}
               style={{
                 opacity: isDisabled ? 0.4 : 1,
                 cursor: isDisabled ? "default" : "pointer",
               }}
             >
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ display: "block" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 15, fontWeight: 400 }}>{item.name}</span>
                   <span
                     className="mono"
@@ -134,12 +127,19 @@ export const MenuSection = memo(function MenuSection({
                   >
                     {item.duration}min
                   </span>
-                </div>
-                <p style={{ fontSize: 12, color: "var(--warm-gray)", marginTop: 4 }}>
+                </span>
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: 12,
+                    color: "var(--warm-gray)",
+                    marginTop: 4,
+                  }}
+                >
                   {item.description}
-                </p>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                </span>
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
                 <span
                   className="mono"
                   style={{
@@ -163,15 +163,16 @@ export const MenuSection = memo(function MenuSection({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    transition: "all 0.25s cubic-bezier(0.22, 1, 0.36, 1)",
+                    transition:
+                      "background 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)",
                     transform: isSelected ? "scale(1)" : "scale(0.9)",
                   }}
                   aria-hidden="true"
                 >
                   {isSelected ? "✓" : ""}
                 </span>
-              </div>
-            </motion.div>
+              </span>
+            </motion.button>
           );
         })}
       </div>
