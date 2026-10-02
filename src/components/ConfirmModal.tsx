@@ -1,7 +1,9 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useDialogFocus } from "../hooks/useDialogFocus";
 import { BookingData } from "../types";
 import { timeToMinutes, minutesToTime } from "../utils/availability";
+import { formatDateLabel } from "../utils/formatDate";
 
 interface ConfirmModalProps {
   readonly data: BookingData;
@@ -36,6 +38,8 @@ export const ConfirmModal = memo(function ConfirmModal({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  const dialogRef = useDialogFocus<HTMLDivElement>();
+
   return (
     <motion.div
       className="modal-overlay"
@@ -49,6 +53,7 @@ export const ConfirmModal = memo(function ConfirmModal({
       transition={{ duration: 0.2 }}
     >
       <motion.div
+        ref={dialogRef}
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, y: 20 }}
@@ -127,10 +132,10 @@ export const ConfirmModal = memo(function ConfirmModal({
             }}
           >
             <span style={{ fontSize: 12, color: "var(--warm-gray)" }}>日時</span>
-            <span className="mono" style={{ fontSize: 14 }}>
-              {data.date?.replace(/-/g, ".")}{" "}
+            <span style={{ fontSize: 14, fontVariantNumeric: "tabular-nums" }}>
+              {data.date ? formatDateLabel(data.date) : ""}{" "}
               {data.time}
-              {endTime ? ` — ${endTime}` : ""}
+              {endTime ? `〜${endTime}` : ""}
             </span>
           </div>
           <div

@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { motion } from "framer-motion";
 import { STYLISTS } from "../constants/stylists";
 import { useInView } from "../hooks/useInView";
 
@@ -42,7 +41,7 @@ export const StylistSection = memo(function StylistSection() {
       </h2>
       <div className="section-accent-line" aria-hidden="true" />
 
-      <motion.div
+      <div
         style={{
           marginTop: 40,
           maxWidth: 480,
@@ -51,12 +50,6 @@ export const StylistSection = memo(function StylistSection() {
           border: "1px solid var(--cream-dark)",
           background: "var(--warm-white)",
         }}
-        whileHover={{
-          y: -4,
-          boxShadow: "0 12px 40px rgba(61, 43, 31, 0.08)",
-          transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
-        }}
-        whileTap={{ scale: 0.99 }}
       >
         <div style={{ fontSize: 36, marginBottom: 16 }} aria-hidden="true">
           {stylist.avatar}
@@ -116,7 +109,7 @@ export const StylistSection = memo(function StylistSection() {
             </span>
           ))}
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 });

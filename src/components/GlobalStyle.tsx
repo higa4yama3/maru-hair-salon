@@ -28,11 +28,17 @@ export const GlobalStyle = memo(function GlobalStyle() {
 
     html {
       scroll-behavior: smooth;
+      /* Keep focused/scrolled-to elements clear of the fixed nav and the sticky confirm bar */
+      scroll-padding-top: 72px;
+      scroll-padding-bottom: calc(var(--confirm-bar-h, 96px) + 16px);
       overflow-x: hidden;
       width: 100%;
       max-width: 100%;
+      text-spacing-trim: trim-start;
+      text-autospace: normal;
     }
 
+    /* Japanese body text is set solid; proportional metrics (palt) only on headings */
     body {
       font-family: 'Zen Kaku Gothic New', sans-serif;
       background: var(--warm-white);
@@ -42,19 +48,60 @@ export const GlobalStyle = memo(function GlobalStyle() {
       -moz-osx-font-smoothing: grayscale;
       text-rendering: geometricPrecision;
       -webkit-text-size-adjust: 100%;
-      font-feature-settings: "palt" 1;
-      overflow-x: hidden;
+      /* clip (not hidden) so body/#root/main don't become scroll containers and break the sticky confirm bar */
+      overflow-x: clip;
       width: 100%;
       max-width: 100%;
     }
 
+    h1, h2, h3 {
+      font-feature-settings: "palt" 1;
+      word-break: auto-phrase;
+      text-wrap: balance;
+    }
+
+    input, textarea, time, pre { text-autospace: no-autospace; }
+
+    button, a, input, label {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--wood-dark);
+      outline-offset: 2px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 8px; left: 8px;
+      z-index: 300;
+      padding: 10px 16px;
+      background: var(--wood-dark);
+      color: white;
+      font-size: 13px;
+      text-decoration: none;
+      transform: translateY(-200%);
+    }
+    .skip-link:focus-visible { transform: translateY(0); }
+
     #root {
-      overflow-x: hidden;
+      overflow-x: clip;
       width: 100%;
     }
 
     main {
-      overflow-x: hidden;
+      overflow-x: clip;
       width: 100%;
     }
 
@@ -241,6 +288,11 @@ export const GlobalStyle = memo(function GlobalStyle() {
     /* ─── Section base ─── */
     section { position: relative; }
 
+    .hero {
+      min-height: 100vh;
+      min-height: 100svh;
+    }
+
     .section-pad {
       padding: 100px 40px;
       max-width: 1100px;
@@ -265,6 +317,7 @@ export const GlobalStyle = memo(function GlobalStyle() {
       position: relative;
       background: none;
       border: none;
+      text-decoration: none;
       cursor: pointer;
       font-family: 'DM Mono', monospace;
       font-size: 11px;
@@ -297,13 +350,19 @@ export const GlobalStyle = memo(function GlobalStyle() {
     .cal-day {
       transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
       cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+      font: inherit;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
       border-radius: 50%;
       aspect-ratio: 1;
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
       position: relative;
     }
-    .cal-day:hover:not(.disabled):not(.closed) {
+    .cal-day:disabled { cursor: default; }
+    .cal-day:hover:not(:disabled):not(.selected) {
       background: var(--cream-dark);
       transform: scale(1.08);
     }
@@ -342,6 +401,7 @@ export const GlobalStyle = memo(function GlobalStyle() {
       background: transparent;
       color: var(--charcoal);
       font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-variant-numeric: tabular-nums;
     }
     .time-slot:hover {
       border-color: var(--gold-light);
@@ -399,10 +459,6 @@ export const GlobalStyle = memo(function GlobalStyle() {
     .btn-primary:active { transform: translateY(0) scale(0.97); box-shadow: none; }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
     .btn-primary:disabled:hover::after { animation: none; }
-    .btn-primary:focus-visible {
-      outline: 2px solid var(--gold);
-      outline-offset: 2px;
-    }
 
     .btn-outline {
       background: transparent;
@@ -422,10 +478,8 @@ export const GlobalStyle = memo(function GlobalStyle() {
       transform: translateY(-1px);
     }
     .btn-outline:active { transform: translateY(0) scale(0.97); }
-    .btn-outline:focus-visible {
-      outline: 2px solid var(--gold);
-      outline-offset: 2px;
-    }
+    .btn-outline:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .btn-outline:disabled:hover { border-color: var(--wood-light); background: transparent; }
 
     /* ─── Input ─── */
     .input-field {
@@ -439,10 +493,11 @@ export const GlobalStyle = memo(function GlobalStyle() {
       font-weight: 300;
       color: var(--charcoal);
       transition: border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      outline: none;
     }
-    .input-field:focus {
-      border-bottom-color: var(--gold);
+    /* The thickened underline is the focus indicator, so it uses a 3:1+ color */
+    .input-field:focus-visible {
+      outline: none;
+      border-bottom-color: var(--wood-dark);
       border-bottom-width: 2px;
       padding-bottom: 11px;
     }
@@ -499,8 +554,14 @@ export const GlobalStyle = memo(function GlobalStyle() {
 
     /* ─── Menu item ─── */
     .menu-item {
+      width: 100%;
       padding: 20px 0;
+      border: none;
       border-bottom: 1px solid var(--cream-dark);
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -618,6 +679,7 @@ export const GlobalStyle = memo(function GlobalStyle() {
       background: var(--warm-white);
       max-width: 480px; width: 90%;
       max-height: 85vh; overflow-y: auto;
+      overscroll-behavior: contain;
       padding: 48px 40px;
       position: relative;
       animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;

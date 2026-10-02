@@ -9,6 +9,7 @@ import {
 } from "../utils/availability";
 import { useInView } from "../hooks/useInView";
 import { MAX_ADVANCE_MONTHS } from "../constants/schedule";
+import { DAY_NAMES, formatDateLabel } from "../utils/formatDate";
 
 interface CalendarSectionProps {
   readonly selectedDate: string | null;
@@ -21,11 +22,6 @@ interface CalendarSectionProps {
   readonly businessHours: readonly BusinessHours[];
 }
 
-const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"] as const;
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-] as const;
 
 const SPECIAL_DATES: readonly never[] = [];
 
@@ -168,26 +164,20 @@ export const CalendarSection = memo(function CalendarSection({
               onClick={prevMonth}
               disabled={!canPrevMonth}
               className="btn-outline"
-              style={{
-                padding: "6px 12px",
-                borderRadius: 0,
-                opacity: canPrevMonth ? 1 : 0.4,
-                cursor: canPrevMonth ? "pointer" : "default",
-              }}
+              style={{ padding: "6px 12px", borderRadius: 0 }}
               aria-label="前の月"
             >
               ←
             </button>
-            <div style={{ textAlign: "center" }}>
-              <div
-                className="serif"
-                style={{
-                  fontSize: 24,
-                  fontWeight: 300,
-                  color: "var(--wood-dark)",
-                }}
-              >
-                {MONTH_NAMES[month]}
+            <div style={{ textAlign: "center" }} aria-live="polite">
+              <div style={{ color: "var(--wood-dark)", lineHeight: 1.2 }}>
+                <span
+                  className="serif"
+                  style={{ fontSize: 28, fontWeight: 300, fontVariantNumeric: "lining-nums" }}
+                >
+                  {month + 1}
+                </span>
+                <span style={{ fontSize: 14 }}>月</span>
               </div>
               <div className="mono" style={{ fontSize: 11, color: "var(--warm-gray)" }}>
                 {year}
@@ -197,12 +187,7 @@ export const CalendarSection = memo(function CalendarSection({
               onClick={nextMonth}
               disabled={!canNextMonth}
               className="btn-outline"
-              style={{
-                padding: "6px 12px",
-                borderRadius: 0,
-                opacity: canNextMonth ? 1 : 0.4,
-                cursor: canNextMonth ? "pointer" : "default",
-              }}
+              style={{ padding: "6px 12px", borderRadius: 0 }}
               aria-label="次の月"
             >
               →
@@ -216,12 +201,13 @@ export const CalendarSection = memo(function CalendarSection({
               gap: 4,
               textAlign: "center",
             }}
-            role="grid"
-            aria-label={`${year}年${month + 1}月のカレンダー`}
+            role="group"
+            aria-label={`${year}年${month + 1}月の日付`}
           >
             {DAY_NAMES.map((d, i) => (
               <div
                 key={d}
+                aria-hidden="true"
                 className="mono"
                 style={{
                   fontSize: 10,
@@ -234,7 +220,6 @@ export const CalendarSection = memo(function CalendarSection({
                   padding: "8px 0",
                   letterSpacing: "0.1em",
                 }}
-                role="columnheader"
               >
                 {d}
               </div>
@@ -274,23 +259,26 @@ export const CalendarSection = memo(function CalendarSection({
                 .filter(Boolean)
                 .join(" ");
 
+              const status = isClosed
+                ? "定休日"
+                : isPast
+                ? "過去の日付"
+                : isMenuUnselected
+                ? ""
+                : hasSlots
+                ? "空きあり"
+                : "空きなし";
+
               return (
-                <motion.div
+                <motion.button
                   key={dateStr}
+                  type="button"
                   className={classNames}
                   whileTap={isClickable ? { scale: 0.95 } : undefined}
-                  onClick={() => isClickable && onSelectDate(dateStr)}
-                  onKeyDown={(e) => {
-                    if (isClickable && (e.key === "Enter" || e.key === " ")) {
-                      e.preventDefault();
-                      onSelectDate(dateStr);
-                    }
-                  }}
-                  role="gridcell"
-                  tabIndex={isClickable ? 0 : -1}
-                  aria-selected={isSelected}
-                  aria-disabled={!isClickable}
-                  aria-label={`${month + 1}月${d}日${isClosed ? " 定休日" : isPast ? " 過去の日付" : hasSlots ? " 空きあり" : ""}`}
+                  onClick={() => onSelectDate(dateStr)}
+                  disabled={!isClickable}
+                  aria-pressed={isSelected}
+                  aria-label={`${formatDateLabel(dateStr)}${status ? ` ${status}` : ""}`}
                   style={{
                     color:
                       dow === 0
@@ -301,7 +289,7 @@ export const CalendarSection = memo(function CalendarSection({
                   }}
                 >
                   {d}
-                </motion.div>
+                </motion.button>
               );
             })}
           </div>
@@ -343,35 +331,33 @@ export const CalendarSection = memo(function CalendarSection({
           {selectedDate ? (
             <>
               <div
-                className="mono"
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--wood-light)",
                   marginBottom: 20,
-                  letterSpacing: "0.1em",
                 }}
               >
-                {selectedDate.replace(/-/g, ".")} の空き状況
+                {formatDateLabel(selectedDate)}の空き状況
               </div>
               {slots.length > 0 ? (
                 <div
                   style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
-                  role="listbox"
-                  aria-label="時間帯選択"
+                  role="group"
+                  aria-label="時間帯"
                 >
                   {slots.map((startTime) => {
                     const endTime = minutesToTime(
                       timeToMinutes(startTime) + totalDuration
                     );
-                    const label = `${startTime} — ${endTime}`;
+                    const label = `${startTime}〜${endTime}`;
                     return (
                       <motion.button
                         key={startTime}
+                        type="button"
                         className={`time-slot ${selectedTime === startTime ? "selected" : ""}`}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => onSelectTime(startTime)}
-                        role="option"
-                        aria-selected={selectedTime === startTime}
+                        aria-pressed={selectedTime === startTime}
                       >
                         {label}
                       </motion.button>

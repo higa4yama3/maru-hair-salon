@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, MouseEvent } from "react";
 
 interface NavProps {
   readonly scrolled: boolean;
@@ -6,7 +6,11 @@ interface NavProps {
   readonly currentView: string;
 }
 
-const NAV_ITEMS = ["STYLIST", "MENU", "RESERVE"] as const;
+const NAV_ITEMS = [
+  { label: "STYLIST", target: "stylist", href: "#stylist" },
+  { label: "MENU", target: "menu", href: "#menu" },
+  { label: "RESERVE", target: "reserve", href: "#calendar" },
+] as const;
 
 export const Nav = memo(function Nav({
   scrolled,
@@ -14,7 +18,10 @@ export const Nav = memo(function Nav({
   currentView,
 }: NavProps) {
   const handleHomeClick = useCallback(
-    () => onNavigate("home"),
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      onNavigate("home");
+    },
     [onNavigate]
   );
 
@@ -36,11 +43,11 @@ export const Nav = memo(function Nav({
           height: 64,
         }}
       >
-        <button
+        <a
+          href="#top"
           onClick={handleHomeClick}
           style={{
-            background: "none",
-            border: "none",
+            textDecoration: "none",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -72,25 +79,29 @@ export const Nav = memo(function Nav({
           >
             maru
           </span>
-        </button>
+        </a>
 
         <div style={{ display: "flex", gap: "clamp(16px, 4vw, 32px)", alignItems: "center" }}>
           {NAV_ITEMS.map((item) => {
-            const isActive = currentView === item.toLowerCase();
+            const isActive = currentView === item.target;
             return (
-              <button
-                key={item}
-                onClick={() => onNavigate(item.toLowerCase())}
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigate(item.target);
+                }}
                 className="nav-link"
                 style={{
                   color: isActive
                     ? "var(--wood-dark)"
                     : "var(--warm-gray)",
                 }}
-                aria-current={isActive ? "page" : undefined}
+                aria-current={isActive ? "location" : undefined}
               >
-                {item}
-              </button>
+                {item.label}
+              </a>
             );
           })}
         </div>

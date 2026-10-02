@@ -18,8 +18,8 @@ const DECO_CIRCLES = [
 export const Hero = memo(function Hero({ onReserve }: HeroProps) {
   return (
     <section
+      className="hero"
       style={{
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
