@@ -362,6 +362,8 @@ export const GlobalStyle = memo(function GlobalStyle() {
       position: relative;
     }
     .cal-day:disabled { cursor: default; }
+    .cal-day.sun { color: var(--dried-rose); }
+    .cal-day.sat { color: var(--dried-lavender); }
     .cal-day:hover:not(:disabled):not(.selected) {
       background: var(--cream-dark);
       transform: scale(1.08);

@@ -254,6 +254,8 @@ export const CalendarSection = memo(function CalendarSection({
                 isPast && "disabled",
                 isClosed && "closed",
                 isToday && "today",
+                dow === 0 && "sun",
+                dow === 6 && "sat",
                 hasSlots && !isPast && !isClosed && "has-slots",
               ]
                 .filter(Boolean)
@@ -279,14 +281,6 @@ export const CalendarSection = memo(function CalendarSection({
                   disabled={!isClickable}
                   aria-pressed={isSelected}
                   aria-label={`${formatDateLabel(dateStr)}${status ? ` ${status}` : ""}`}
-                  style={{
-                    color:
-                      dow === 0
-                        ? "var(--dried-rose)"
-                        : dow === 6
-                        ? "var(--dried-lavender)"
-                        : undefined,
-                  }}
                 >
                   {d}
                 </motion.button>
