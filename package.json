@@ -8,7 +8,7 @@
     "framer-motion": "^12.34.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,5 +42,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "nth-check": "^2.1.1",
+    "postcss": "^8.5.32",
+    "qs": "^6.17.1",
+    "underscore": "^1.13.8"
   }
 }
